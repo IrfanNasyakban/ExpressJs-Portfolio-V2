@@ -5,59 +5,44 @@ const Users = require("./UserModel");
 
 const { DataTypes } = Sequelize;
 
-const Biodata = db.define(
-  "biodata",
+const Skill = db.define(
+  "skill",
   {
-    nama: {
+    languages: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    gender: {
+    databases: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    email: {
+    tools: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    frameworks: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    other: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
         isEmail: true,
       },
-    },
-    tglLahir: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    noHp: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    alamat: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    image: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    url: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -72,11 +57,7 @@ const Biodata = db.define(
   },
 );
 
-Users.hasMany(Biodata);
-Biodata.belongsTo(Users, {foreignKey: 'userId'})
+Users.hasMany(Skill);
+Skill.belongsTo(Users, {foreignKey: 'userId'})
 
-module.exports = Biodata;
-
-(async () => {
-  await db.sync();
-})();
+module.exports = Skill;

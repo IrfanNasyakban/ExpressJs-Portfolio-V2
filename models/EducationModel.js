@@ -5,46 +5,24 @@ const Users = require("./UserModel");
 
 const { DataTypes } = Sequelize;
 
-const Biodata = db.define(
-  "biodata",
+const Education = db.define(
+  "education",
   {
-    nama: {
+    instansi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    gender: {
+    bagian: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        isEmail: true,
-      },
-    },
-    tglLahir: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    noHp: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    alamat: {
+    periode: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -72,11 +50,7 @@ const Biodata = db.define(
   },
 );
 
-Users.hasMany(Biodata);
-Biodata.belongsTo(Users, {foreignKey: 'userId'})
+Users.hasMany(Education);
+Education.belongsTo(Users, {foreignKey: 'userId'})
 
-module.exports = Biodata;
-
-(async () => {
-  await db.sync();
-})();
+module.exports = Education;

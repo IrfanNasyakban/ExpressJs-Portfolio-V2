@@ -5,39 +5,17 @@ const Users = require("./UserModel");
 
 const { DataTypes } = Sequelize;
 
-const Biodata = db.define(
-  "biodata",
+const Experience = db.define(
+  "experience",
   {
-    nama: {
+    namaPerusahaan: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    gender: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        isEmail: true,
-      },
-    },
-    tglLahir: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    noHp: {
+    divisi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -51,13 +29,28 @@ const Biodata = db.define(
         notEmpty: true,
       },
     },
-    image: {
+    status: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
-    url: {
+    periode: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isEmail: true,
+      },
+    },
+    jobdesk: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isEmail: true,
+      },
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -72,11 +65,7 @@ const Biodata = db.define(
   },
 );
 
-Users.hasMany(Biodata);
-Biodata.belongsTo(Users, {foreignKey: 'userId'})
+Users.hasMany(Experience);
+Experience.belongsTo(Users, {foreignKey: 'userId'})
 
-module.exports = Biodata;
-
-(async () => {
-  await db.sync();
-})();
+module.exports = Experience;

@@ -5,46 +5,24 @@ const Users = require("./UserModel");
 
 const { DataTypes } = Sequelize;
 
-const Biodata = db.define(
-  "biodata",
+const Certificate = db.define(
+  "certificate",
   {
-    nama: {
+    judul: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    gender: {
+    deskripsi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        isEmail: true,
-      },
-    },
-    tglLahir: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    noHp: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    alamat: {
+    link: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -72,11 +50,7 @@ const Biodata = db.define(
   },
 );
 
-Users.hasMany(Biodata);
-Biodata.belongsTo(Users, {foreignKey: 'userId'})
+Users.hasMany(Certificate);
+Certificate.belongsTo(Users, {foreignKey: 'userId'})
 
-module.exports = Biodata;
-
-(async () => {
-  await db.sync();
-})();
+module.exports = Certificate;

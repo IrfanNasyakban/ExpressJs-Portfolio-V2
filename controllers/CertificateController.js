@@ -1,30 +1,19 @@
-const Biodata = require("../models/BiodataModel.js");
+const Certificate = require("../models/CertificateModel.js");
 const Users = require("../models/UserModel.js");
 const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
-const getRes = async (req, res) => {
-  try {
-    const data = {
-      data: "data success",
-    };
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).json({ msg: error.message });
-  }
-};
-
-const getBiodata = async (req, res) => {
+const getCertificate = async (req, res) => {
     try {
         if (req.role === "admin") {
-            const biodata = await Biodata.findOne({
+            const response = await Certificate.findOne({
                 include: [{
                     model: Users,
                     attributes: ['username', 'email', 'role']
                 }],
             });
-            res.status(200).json(biodata);
+            res.status(200).json(response);
         } else {
             res.status(422).json(msg="Akses hanya untuk admin");
         }
@@ -33,12 +22,12 @@ const getBiodata = async (req, res) => {
     }
 }
 
-const getBiodataById = async (req, res) => {
+const getCertificateById = async (req, res) => {
     try {
         let response;
         if (req.role === "admin") {
-            response = await Biodata.findOne({
-                attributes: ['id', 'nama', 'gender', 'email', 'tglLahir', 'noHp', 'alamat', 'image', 'url'],
+            response = await Certificate.findOne({
+                attributes: ['id', 'judul', 'deskripsi', 'link', 'image', 'url'],
                 where: {
                     id: req.params.id
                 },
@@ -56,14 +45,11 @@ const getBiodataById = async (req, res) => {
     }
 };
 
-const createBiodata = async (req, res) => {
+const createCertificate = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "No File Uploaded" })
-    const nama = req.body.nama
-    const gender = req.body.gender
-    const email = req.body.email
-    const tglLahir = req.body.tglLahir
-    const noHp = req.body.noHp
-    const alamat = req.body.alamat
+    const judul = req.body.judul
+    const deskripsi = req.body.deskripsi
+    const link = req.body.link
     const file = req.files.file
     const fileSize = file.data.length
     const ext = path.extname(file.name)
@@ -79,13 +65,10 @@ const createBiodata = async (req, res) => {
     file.mv(`./public/images/${fileName}`, async (err) => {
         if (err) return res.status(500).json({ msg: err.message })
         try {
-            const biodata = await Biodata.create({
-                nama: nama,
-                gender: gender,
-                email: email,
-                tglLahir: tglLahir,
-                noHp: noHp,
-                alamat: alamat,
+            const certificate = await Certificate.create({
+                judul: judul,
+                deskripsi: deskripsi,
+                link: link,
                 image: fileName,
                 url: url,
                 userId: req.userId
@@ -100,15 +83,15 @@ const createBiodata = async (req, res) => {
     })
 }
 
-const updateBiodata = async (req, res) => {
-    const biodata = await Biodata.findOne({
+const updateCertificate = async (req, res) => {
+    const certificate = await Certificate.findOne({
         where: {
             id: req.params.id,
         },
     });
-    if (!biodata) return res.status(404).json({ msg: "No Data Found" });
+    if (!certificate) return res.status(404).json({ msg: "No Data Found" });
 
-    let fileName = biodata.image;
+    let fileName = certificate.image;
 
     if (req.files && req.files.file) {
         const file = req.files.file;
@@ -125,7 +108,7 @@ const updateBiodata = async (req, res) => {
         }
 
         // Delete the old image file
-        const filepath = `./public/images/${biodata.image}`;
+        const filepath = `./public/images/${certificate.image}`;
         if (fs.existsSync(filepath)) {
             fs.unlinkSync(filepath); // Delete the old image
         }
@@ -135,23 +118,17 @@ const updateBiodata = async (req, res) => {
             if (err) return res.status(500).json({ msg: err.message });
         });
     }
-    const nama = req.body.nama;
-    const gender = req.body.gender;
-    const email = req.body.email;
-    const tglLahir = req.body.tglLahir;
-    const noHp = req.body.noHp;
-    const alamat = req.body.alamat;
+    const judul = req.body.judul;
+    const deskripsi = req.body.deskripsi;
+    const link = req.body.link;
     const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
 
     try {
-        await Biodata.update(
+        await Certificate.update(
             {
-                nama: nama,
-                gender: gender,
-                email: email,
-                tglLahir: tglLahir,
-                noHp: noHp,
-                alamat: alamat,
+                judul: judul,
+                deskripsi: deskripsi,
+                link: link,
                 image: fileName,
                 url: url,
             },
@@ -161,39 +138,38 @@ const updateBiodata = async (req, res) => {
                 },
             }
         );
-        res.status(200).json({ msg: "Biodata Updated Successfuly" });
+        res.status(200).json({ msg: "Certificate Updated Successfuly" });
     } catch (error) {
         console.log(error.message);
     }
 };
 
-const deleteBiodata = async (req, res) => {
-    const biodata = await Biodata.findOne({
+const deleteCertificate = async (req, res) => {
+    const certificate = await Certificate.findOne({
       where: {
         id: req.params.id,
       },
     });
-    if (!biodata) return res.status(404).json({ msg: "No Data Found" });
+    if (!certificate) return res.status(404).json({ msg: "No Data Found" });
   
     try {
-      const filepath = `./public/images/${biodata.image}`;
+      const filepath = `./public/images/${certificate.image}`;
       fs.unlinkSync(filepath);
-      await Biodata.destroy({
+      await Certificate.destroy({
         where: {
           id: req.params.id,
         },
       });
-      res.status(200).json({ msg: "Biodata Deleted Successfuly" });
+      res.status(200).json({ msg: "Certificate Deleted Successfuly" });
     } catch (error) {
       console.log(error.message);
     }
   };
 
 module.exports = {
-  getRes,
-  getBiodata,
-  getBiodataById,
-  createBiodata,
-  updateBiodata,
-  deleteBiodata,
+  getCertificate,
+  getCertificateById,
+  createCertificate,
+  updateCertificate,
+  deleteCertificate,
 };
