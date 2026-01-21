@@ -5,45 +5,31 @@ const Users = require("./UserModel");
 
 const { DataTypes } = Sequelize;
 
-const Project = db.define(
-  "project",
+const Organizations = db.define(
+  "organizations",
   {
-    judul: {
+    organisasi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    deskripsi: {
+    divisi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    tags: {
+    lokasi: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    techStack: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    link: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
-    github: {
+    periode: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -71,7 +57,7 @@ const Project = db.define(
   },
 );
 
-Users.hasMany(Project);
-Project.belongsTo(Users, {foreignKey: 'userId'})
+Users.hasMany(Organizations);
+Organizations.belongsTo(Users, {foreignKey: 'userId'})
 
-module.exports = Project;
+module.exports = Organizations;

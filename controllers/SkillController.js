@@ -4,7 +4,7 @@ const Users = require("../models/UserModel.js");
 const getSkill = async (req, res) => {
     try {
         if (req.role === "admin") {
-            const response = await Skill.findAll({
+            const response = await Skill.findOne({
                 include: [{
                     model: Users,
                     attributes: ['username', 'email', 'role']

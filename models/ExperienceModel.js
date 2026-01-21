@@ -41,7 +41,6 @@ const Experience = db.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        isEmail: true,
       },
     },
     jobdesk: {
@@ -49,7 +48,6 @@ const Experience = db.define(
       allowNull: false,
       validate: {
         notEmpty: true,
-        isEmail: true,
       },
     },
     userId: {

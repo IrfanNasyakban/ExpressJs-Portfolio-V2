@@ -1,13 +1,13 @@
-const Education = require("../models/EducationModel.js");
+const Organizations = require("../models/OrganizationsModel.js");
 const Users = require("../models/UserModel.js");
 const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
-const getEducation = async (req, res) => {
+const getOrganizations = async (req, res) => {
     try {
         if (req.role === "admin") {
-            const response = await Education.findAll({
+            const response = await Organizations.findAll({
                 include: [{
                     model: Users,
                     attributes: ['username', 'email', 'role']
@@ -22,12 +22,12 @@ const getEducation = async (req, res) => {
     }
 }
 
-const getEducationById = async (req, res) => {
+const getOrganizationsById = async (req, res) => {
     try {
         let response;
         if (req.role === "admin") {
-            response = await Education.findOne({
-                attributes: ['id', 'instansi', 'bagian', 'periode', 'image', 'url'],
+            response = await Organizations.findOne({
+                attributes: ['id', 'organisasi', 'divisi', 'lokasi', 'periode', 'image', 'url'],
                 where: {
                     id: req.params.id
                 },
@@ -45,10 +45,11 @@ const getEducationById = async (req, res) => {
     }
 };
 
-const createEducation = async (req, res) => {
+const createOrganizations = async (req, res) => {
     if (req.files === null) return res.status(400).json({ msg: "No File Uploaded" })
-    const instansi = req.body.instansi
-    const bagian = req.body.bagian
+    const organisasi = req.body.organisasi
+    const divisi = req.body.divisi
+    const lokasi = req.body.lokasi
     const periode = req.body.periode
     const file = req.files.file
     const fileSize = file.data.length
@@ -65,16 +66,17 @@ const createEducation = async (req, res) => {
     file.mv(`./public/images/${fileName}`, async (err) => {
         if (err) return res.status(500).json({ msg: err.message })
         try {
-            const education = await Education.create({
-                instansi: instansi,
-                bagian: bagian,
+            const organizations = await Organizations.create({
+                organisasi: organisasi,
+                divisi: divisi,
+                lokasi: lokasi,
                 periode: periode,
                 image: fileName,
                 url: url,
                 userId: req.userId
             });
             res.status(201).json({
-                id: education.id,
+                id: organizations.id,
                 msg: "Image berhasil di tambahkan"
             })
         } catch (error) {
@@ -83,15 +85,15 @@ const createEducation = async (req, res) => {
     })
 }
 
-const updateEducation = async (req, res) => {
-    const education = await Education.findOne({
+const updateOrganizations = async (req, res) => {
+    const organizations = await Organizations.findOne({
         where: {
             id: req.params.id,
         },
     });
-    if (!education) return res.status(404).json({ msg: "No Data Found" });
+    if (!organizations) return res.status(404).json({ msg: "No Data Found" });
 
-    let fileName = education.image;
+    let fileName = organizations.image;
 
     if (req.files && req.files.file) {
         const file = req.files.file;
@@ -108,7 +110,7 @@ const updateEducation = async (req, res) => {
         }
 
         // Delete the old image file
-        const filepath = `./public/images/${education.image}`;
+        const filepath = `./public/images/${organizations.image}`;
         if (fs.existsSync(filepath)) {
             fs.unlinkSync(filepath); // Delete the old image
         }
@@ -118,16 +120,18 @@ const updateEducation = async (req, res) => {
             if (err) return res.status(500).json({ msg: err.message });
         });
     }
-    const instansi = req.body.instansi;
-    const bagian = req.body.bagian;
+    const organisasi = req.body.organisasi;
+    const divisi = req.body.divisi;
+    const lokasi = req.body.lokasi;
     const periode = req.body.periode;
     const url = `${req.protocol}://${req.get("host")}/images/${fileName}`;
 
     try {
-        await Education.update(
+        await Organizations.update(
             {
-                instansi: instansi,
-                bagian: bagian,
+                organisasi: organisasi,
+                divisi: divisi,
+                lokasi: lokasi,
                 periode: periode,
                 image: fileName,
                 url: url,
@@ -138,38 +142,38 @@ const updateEducation = async (req, res) => {
                 },
             }
         );
-        res.status(200).json({ msg: "Education Updated Successfuly" });
+        res.status(200).json({ msg: "organizations Updated Successfuly" });
     } catch (error) {
         console.log(error.message);
     }
 };
 
-const deleteEducation = async (req, res) => {
-    const education = await Education.findOne({
+const deleteOrganizations = async (req, res) => {
+    const organizations = await Organizations.findOne({
       where: {
         id: req.params.id,
       },
     });
-    if (!education) return res.status(404).json({ msg: "No Data Found" });
+    if (!organizations) return res.status(404).json({ msg: "No Data Found" });
   
     try {
-      const filepath = `./public/images/${education.image}`;
+      const filepath = `./public/images/${organizations.image}`;
       fs.unlinkSync(filepath);
-      await Education.destroy({
+      await Organizations.destroy({
         where: {
           id: req.params.id,
         },
       });
-      res.status(200).json({ msg: "Education Deleted Successfuly" });
+      res.status(200).json({ msg: "Organizations Deleted Successfuly" });
     } catch (error) {
       console.log(error.message);
     }
   };
 
 module.exports = {
-  getEducation,
-  getEducationById,
-  createEducation,
-  updateEducation,
-  deleteEducation,
+  getOrganizations,
+  getOrganizationsById,
+  createOrganizations,
+  updateOrganizations,
+  deleteOrganizations,
 };

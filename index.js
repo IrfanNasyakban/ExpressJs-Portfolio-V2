@@ -17,6 +17,8 @@ const ProjectRoute = require("./routes/ProjectRoute.js");
 const CertificateRoute = require("./routes/CertificateRoute.js");
 const SkillRoute = require("./routes/SkillRoute.js");
 const ExperienceRoute = require("./routes/ExperienceRoute.js");
+const EducationRoute = require("./routes/EducationRoute.js");
+const OrganizationsRoute = require("./routes/OrganizationsRoute.js");
 
 dotenv.config();
 const app = express();
@@ -90,6 +92,8 @@ app.use(ProjectRoute);
 app.use(CertificateRoute);
 app.use(SkillRoute);
 app.use(ExperienceRoute);
+app.use(EducationRoute);
+app.use(OrganizationsRoute);
 
 // Error handling untuk CORS
 app.use((err, req, res, next) => {

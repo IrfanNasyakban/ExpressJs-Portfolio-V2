@@ -74,7 +74,7 @@ const createCertificate = async (req, res) => {
                 userId: req.userId
             });
             res.status(201).json({
-                id: biodata.id,
+                id: certificate.id,
                 msg: "Image berhasil di tambahkan"
             })
         } catch (error) {
