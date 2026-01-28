@@ -1,6 +1,20 @@
 const Skill = require("../models/SkillModel.js");
 const Users = require("../models/UserModel.js");
 
+const getAllSkill = async (req, res) => {
+    try {
+        const response = await Skill.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getSkill = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -98,6 +112,7 @@ const deleteSkill = async (req, res) => {
 };
 
 module.exports = {
+  getAllSkill,
   getSkill,
   getSkillById,
   createSkill,

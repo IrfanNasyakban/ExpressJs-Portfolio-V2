@@ -4,10 +4,24 @@ const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
+const getAllCertificate = async (req, res) => {
+    try {
+        const response = await Certificate.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getCertificate = async (req, res) => {
     try {
         if (req.role === "admin") {
-            const response = await Certificate.findOne({
+            const response = await Certificate.findAll({
                 include: [{
                     model: Users,
                     attributes: ['username', 'email', 'role']
@@ -167,6 +181,7 @@ const deleteCertificate = async (req, res) => {
   };
 
 module.exports = {
+  getAllCertificate,
   getCertificate,
   getCertificateById,
   createCertificate,

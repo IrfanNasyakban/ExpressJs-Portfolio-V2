@@ -1,6 +1,7 @@
 const express = require("express");
 const {
     getRes,
+    getAllBiodata,
     getBiodata,
     getBiodataById,
     createBiodata,
@@ -12,6 +13,7 @@ const { verifyUser } = require("../middleware/AuthUser.js")
 const router = express.Router()
 
 router.get('/', getRes)
+router.get('/all-biodata', getAllBiodata)
 router.get('/biodata', verifyUser, getBiodata)
 router.get('/biodata/:id', verifyUser, getBiodataById)
 router.post('/biodata', verifyUser, createBiodata)

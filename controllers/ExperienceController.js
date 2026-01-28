@@ -1,6 +1,20 @@
 const Experience = require("../models/ExperienceModel.js");
 const Users = require("../models/UserModel.js");
 
+const getAllExperience = async (req, res) => {
+    try {
+        const response = await Experience.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getExperience = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -100,6 +114,7 @@ const deleteExperience = async (req, res) => {
 };
 
 module.exports = {
+  getAllExperience,
   getExperience,
   getExperienceById,
   createExperience,

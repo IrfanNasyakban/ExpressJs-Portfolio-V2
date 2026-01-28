@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+    getAllProject,
     getProject,
     getProjectById,
     createProject,
@@ -10,6 +11,7 @@ const { verifyUser } = require("../middleware/AuthUser.js")
 
 const router = express.Router()
 
+router.get('/all-project', getAllProject)
 router.get('/project', verifyUser, getProject)
 router.get('/project/:id', verifyUser, getProjectById)
 router.post('/project', verifyUser, createProject)

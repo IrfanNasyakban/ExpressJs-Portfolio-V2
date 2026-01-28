@@ -19,6 +19,7 @@ const SkillRoute = require("./routes/SkillRoute.js");
 const ExperienceRoute = require("./routes/ExperienceRoute.js");
 const EducationRoute = require("./routes/EducationRoute.js");
 const OrganizationsRoute = require("./routes/OrganizationsRoute.js");
+const ChatbotRoute = require("./routes/ChatbotRoute.js");
 
 dotenv.config();
 const app = express();
@@ -94,6 +95,7 @@ app.use(SkillRoute);
 app.use(ExperienceRoute);
 app.use(EducationRoute);
 app.use(OrganizationsRoute);
+app.use('/api/chatbot', ChatbotRoute);
 
 // Error handling untuk CORS
 app.use((err, req, res, next) => {

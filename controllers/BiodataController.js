@@ -15,6 +15,20 @@ const getRes = async (req, res) => {
   }
 };
 
+const getAllBiodata = async (req, res) => {
+    try {
+        const response = await Biodata.findOne({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getBiodata = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -191,6 +205,7 @@ const deleteBiodata = async (req, res) => {
 
 module.exports = {
   getRes,
+  getAllBiodata,
   getBiodata,
   getBiodataById,
   createBiodata,

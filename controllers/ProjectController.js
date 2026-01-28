@@ -4,6 +4,20 @@ const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
+const getAllProject = async (req, res) => {
+    try {
+        const response = await Project.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getProject = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -179,6 +193,7 @@ const deleteProject = async (req, res) => {
   };
 
 module.exports = {
+  getAllProject,
   getProject,
   getProjectById,
   createProject,

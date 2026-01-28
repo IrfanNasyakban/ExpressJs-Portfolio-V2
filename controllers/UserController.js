@@ -90,6 +90,73 @@ const updateUsers = async(req, res) =>{
     }
 }
 
+const changePassword = async(req, res) => {
+    try {
+        // Mendapatkan id user dari token JWT yang sudah diverifikasi di middleware
+        const userId = req.userId;
+        
+        // Mendapatkan data dari request body
+        const { oldPassword, newPassword, confNewPassword } = req.body;
+        
+        // Validasi input
+        if (!oldPassword || !newPassword || !confNewPassword) {
+            return res.status(400).json({ 
+                msg: "Semua field harus diisi" 
+            });
+        }
+        
+        // Cek apakah password baru dan konfirmasi password sama
+        if (newPassword !== confNewPassword) {
+            return res.status(400).json({ 
+                msg: "Password baru dan konfirmasi password tidak cocok" 
+            });
+        }
+        
+        // Cari user berdasarkan id
+        const user = await Users.findOne({
+            where: {
+                id: userId
+            }
+        });
+        
+        if (!user) {
+            return res.status(404).json({ 
+                msg: "User tidak ditemukan" 
+            });
+        }
+        
+        // Verifikasi password lama
+        const validPassword = await argon.verify(user.password, oldPassword);
+        if (!validPassword) {
+            return res.status(400).json({ 
+                msg: "Password lama tidak valid" 
+            });
+        }
+        
+        // Jika password lama valid, hash password baru
+        const hashNewPassword = await argon.hash(newPassword);
+        
+        // Update password user
+        await Users.update(
+            { password: hashNewPassword },
+            {
+                where: {
+                    id: userId
+                }
+            }
+        );
+        
+        res.status(200).json({ 
+            msg: "Password berhasil diubah" 
+        });
+        
+    } catch (error) {
+        res.status(500).json({ 
+            msg: error.message 
+        });
+    }
+};
+
 const deleteUsers = async(req, res) => {
     const user = await Users.findOne({
         where: {
@@ -114,5 +181,6 @@ module.exports = {
     getUsersById,
     createUsers,
     updateUsers,
+    changePassword,
     deleteUsers
 };

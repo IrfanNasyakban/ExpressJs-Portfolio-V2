@@ -4,6 +4,20 @@ const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
+const getAllOrganizations = async (req, res) => {
+    try {
+        const response = await Organizations.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getOrganizations = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -171,6 +185,7 @@ const deleteOrganizations = async (req, res) => {
   };
 
 module.exports = {
+  getAllOrganizations,
   getOrganizations,
   getOrganizationsById,
   createOrganizations,

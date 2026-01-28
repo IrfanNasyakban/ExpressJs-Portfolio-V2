@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+    getAllExperience,
     getExperience,
     getExperienceById,
     createExperience,
@@ -10,6 +11,7 @@ const { verifyUser } = require("../middleware/AuthUser.js")
 
 const router = express.Router()
 
+router.get('/all-experience', getAllExperience)
 router.get('/experience', verifyUser, getExperience)
 router.get('/experience/:id', verifyUser, getExperienceById)
 router.post('/experience', verifyUser, createExperience)

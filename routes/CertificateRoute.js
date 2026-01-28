@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+    getAllCertificate,
     getCertificate,
     getCertificateById,
     createCertificate,
@@ -10,6 +11,7 @@ const { verifyUser } = require("../middleware/AuthUser.js")
 
 const router = express.Router()
 
+router.get('/all-certificate', getAllCertificate)
 router.get('/certificate', verifyUser, getCertificate)
 router.get('/certificate/:id', verifyUser, getCertificateById)
 router.post('/certificate', verifyUser, createCertificate)

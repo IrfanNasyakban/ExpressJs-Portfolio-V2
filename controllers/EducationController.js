@@ -4,6 +4,20 @@ const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
+const getAllEducation = async (req, res) => {
+    try {
+        const response = await Education.findAll({
+            include: [{
+                model: Users,
+                attributes: ['username', 'email', 'role']
+            }],
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
 const getEducation = async (req, res) => {
     try {
         if (req.role === "admin") {
@@ -167,6 +181,7 @@ const deleteEducation = async (req, res) => {
   };
 
 module.exports = {
+  getAllEducation,
   getEducation,
   getEducationById,
   createEducation,

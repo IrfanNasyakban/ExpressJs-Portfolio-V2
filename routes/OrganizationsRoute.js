@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+    getAllOrganizations,
     getOrganizations,
     getOrganizationsById,
     createOrganizations,
@@ -10,6 +11,7 @@ const { verifyUser } = require("../middleware/AuthUser.js")
 
 const router = express.Router()
 
+router.get('/all-organizations', getAllOrganizations)
 router.get('/organizations', verifyUser, getOrganizations)
 router.get('/organizations/:id', verifyUser, getOrganizationsById)
 router.post('/organizations', verifyUser, createOrganizations)
