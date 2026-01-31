@@ -22,20 +22,44 @@ const chatWithAI = async (req, res) => {
       // Continue without portfolio data
     }
 
-    // Siapkan system prompt dengan informasi tentang Irvan
-    const systemPrompt = `You are an AI assistant for Irvan Nasyakban's portfolio website. 
+    // Siapkan system prompt dengan batasan yang ketat
+    const systemPrompt = `You are an AI assistant EXCLUSIVELY for Irvan Nasyakban's portfolio website. 
 
 ${portfolioContext}
 
-Your role is to help visitors learn about Irvan's professional background, skills, projects, experience, education, certifications, and contact information.
+CRITICAL RULES - YOU MUST FOLLOW THESE STRICTLY:
+1. ONLY answer questions about Irvan Nasyakban's portfolio information (projects, skills, experience, education, certifications, organizations, contact info)
+2. If a question is NOT related to Irvan's portfolio, you MUST respond with EXACTLY this message in Bahasa Indonesia: "Mohon maaf saya tidak dapat memberikan informasi apapun kecuali tentang portfolio Irvan Nasyakban"
+3. DO NOT answer general knowledge questions, math problems, coding help, or any topic outside Irvan's portfolio
+4. DO NOT provide information about other people, companies, or topics
+5. DO NOT engage in conversations about politics, religion, or sensitive topics
+6. DO NOT write code, solve problems, or provide tutorials unless it's specifically about Irvan's portfolio projects
 
-Guidelines:
-- Be friendly, professional, and informative
-- Provide specific details from the portfolio data when answering questions
-- If asked about topics outside of Irvan's portfolio, politely redirect the conversation
-- When mentioning projects, include relevant technologies and descriptions
-- When discussing skills, be specific about proficiency levels
-- Format responses clearly and concisely`;
+ALLOWED TOPICS:
+- Irvan's personal information (name, contact, education)
+- Irvan's technical skills and proficiency levels
+- Irvan's projects (descriptions, technologies used, links)
+- Irvan's work experience and job descriptions
+- Irvan's organizational activities
+- Irvan's educational background
+- Irvan's certifications and achievements
+- How to contact Irvan
+- Questions comparing Irvan's skills or projects
+
+EXAMPLES OF INVALID QUESTIONS (respond with the rejection message):
+- "What is the capital of France?"
+- "How do I make a cake?"
+- "Write a Python function to sort an array"
+- "What is 2+2?"
+- "Tell me about Elon Musk"
+- "What's the weather today?"
+- "How to learn programming?"
+
+RESPONSE FORMAT:
+- Be friendly, professional, and informative for VALID questions
+- Provide specific details from the portfolio data
+- Use markdown formatting for better readability (bold, lists, etc.)
+- For INVALID questions, respond ONLY with: "Mohon maaf saya tidak dapat memberikan informasi apapun kecuali tentang portfolio Irvan Nasyakban"`;
 
     // Siapkan messages untuk API
     const messages = [
@@ -57,10 +81,11 @@ Guidelines:
       {
         model: 'llama-3.3-70b-versatile',
         messages: messages,
-        temperature: 0.7,
+        temperature: 0.3, // Lower temperature for more focused responses
         max_tokens: 1024,
-        top_p: 1,
-        stream: false
+        top_p: 0.9, // Lower top_p for more deterministic responses
+        stream: false,
+        stop: null // No stop sequences
       },
       {
         headers: {
@@ -71,7 +96,15 @@ Guidelines:
     );
 
     // Extract AI response
-    const aiMessage = response.data.choices[0].message.content;
+    let aiMessage = response.data.choices[0].message.content;
+
+    // Post-processing: Double check if response is about portfolio
+    // This is a safety net in case the model doesn't follow instructions perfectly
+    const isPortfolioRelated = checkIfPortfolioRelated(message, aiMessage);
+    
+    if (!isPortfolioRelated) {
+      aiMessage = "Mohon maaf saya tidak dapat memberikan informasi apapun kecuali tentang portfolio Irvan Nasyakban";
+    }
 
     // Return response
     return res.status(200).json({
@@ -105,6 +138,54 @@ Guidelines:
       error: error.message
     });
   }
+};
+
+// Helper function to check if question/response is portfolio-related
+const checkIfPortfolioRelated = (question, response) => {
+  const lowerQuestion = question.toLowerCase();
+  const lowerResponse = response.toLowerCase();
+
+  // Keywords that indicate portfolio-related questions
+  const portfolioKeywords = [
+    'irvan', 'nasyakban', 'portfolio', 'project', 'skill', 'experience',
+    'education', 'certificate', 'organization', 'work', 'job', 'technical',
+    'programming', 'developer', 'software', 'contact', 'email', 'phone',
+    'doorsmeer', 'mentor heal', 'greensys', 'miti', 'javascript', 'python',
+    'react', 'express', 'node', 'database', 'mysql', 'mongodb'
+  ];
+
+  // Keywords that indicate non-portfolio questions (common general knowledge)
+  const nonPortfolioKeywords = [
+    'weather', 'recipe', 'capital', 'country', 'president', 'celebrity',
+    'movie', 'song', 'book', 'history', 'science', 'math problem', 'solve',
+    'calculate', 'write code', 'tutorial', 'how to make', 'what is the meaning'
+  ];
+
+  // Check if response is the rejection message
+  if (response.includes("Mohon maaf saya tidak dapat memberikan informasi apapun kecuali tentang portfolio Irvan Nasyakban")) {
+    return true; // It's handling it correctly
+  }
+
+  // Check for obvious non-portfolio keywords in question
+  const hasNonPortfolioKeywords = nonPortfolioKeywords.some(keyword => 
+    lowerQuestion.includes(keyword)
+  );
+
+  if (hasNonPortfolioKeywords) {
+    return false; // Definitely not portfolio-related
+  }
+
+  // Check for portfolio keywords in question or response
+  const hasPortfolioKeywords = portfolioKeywords.some(keyword => 
+    lowerQuestion.includes(keyword) || lowerResponse.includes(keyword)
+  );
+
+  // If question is very short and generic, be more strict
+  if (question.trim().split(' ').length <= 3 && !hasPortfolioKeywords) {
+    return false;
+  }
+
+  return hasPortfolioKeywords;
 };
 
 const getPortfolioData = async () => {
