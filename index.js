@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const dotenv = require("dotenv");
 const path = require('path');
 const fs = require('fs');
-const db = require("../backend/config/database.js");
+const db = require("./config/database.js");
 const cookieParser = require("cookie-parser");
 const FileUpload = require("express-fileupload");
 const cors = require("cors");
@@ -24,18 +24,19 @@ const ChatbotRoute = require("./routes/ChatbotRoute.js");
 dotenv.config();
 const app = express();
 
-const sessionStore = SequelizeStore(session.Store)
+const sessionStore = SequelizeStore(session.Store);
 
 const store = new sessionStore({
     db: db
-})
+});
 
 const allowedOrigins = [
     'http://localhost:3000',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'https://irvannasyakban.com'
 ];
 
-// SINGLE CORS Configuration - NO manual middleware
+// CORS Configuration
 app.use(cors({
     origin: function (origin, callback) {
         console.log('CORS Check - Origin:', origin);
@@ -60,6 +61,9 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
+// Handle preflight OPTIONS requests - PENTING!
+app.options('*', cors());
+
 // Session Configuration
 app.use(session({
     secret: process.env.SESS_SECRET,
@@ -72,7 +76,7 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
-}))
+}));
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
@@ -80,12 +84,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(FileUpload());
 
-// Static Files - Let main CORS handle it
+// Static Files
 app.use(express.static("public"));
 
-// Images - Let main CORS handle it
+// Images
 app.use("/images", express.static("./public/images"));
 
+// Routes
 app.use(AuthRoute);
 app.use(UserRoute);
 app.use(BiodataRoute);
@@ -114,4 +119,4 @@ app.use((err, req, res, next) => {
     }
 });
 
-app.listen(process.env.APP_PORT, ()=> console.log(`Server running on port ${process.env.APP_PORT}`));
+app.listen(process.env.APP_PORT, () => console.log(`Server running on port ${process.env.APP_PORT}`));
